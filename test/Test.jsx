@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import DateTimePicker from 'react-datetime-picker/src/entry.nostyle';
+import DateTimePicker from 'react-datetime-picker/src';
 import 'react-datetime-picker/src/DateTimePicker.less';
 import 'react-calendar/src/Calendar.less';
 import 'react-clock/src/Clock.less';
