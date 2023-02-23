@@ -1,5 +1,5 @@
-import React, { createRef, PureComponent } from 'react';
-import PropTypes from 'prop-types';
+import React, { createRef, PureComponent } from "react";
+import PropTypes from "prop-types";
 import {
   getYear,
   getMonthHuman,
@@ -8,33 +8,30 @@ import {
   getMinutes,
   getSeconds,
   getHoursMinutesSeconds,
-} from '@wojtekmaj/date-utils';
+} from "@wojtekmaj/date-utils";
 
-import DayInput from 'react-date-picker/dist/DateInput/DayInput';
-import MonthInput from 'react-date-picker/dist/DateInput/MonthInput';
-import MonthSelect from 'react-date-picker/dist/DateInput/MonthSelect';
-import YearInput from 'react-date-picker/dist/DateInput/YearInput';
-import Hour12Input from 'react-time-picker/dist/TimeInput/Hour12Input';
-import Hour24Input from 'react-time-picker/dist/TimeInput/Hour24Input';
-import MinuteInput from 'react-time-picker/dist/TimeInput/MinuteInput';
-import SecondInput from 'react-time-picker/dist/TimeInput/SecondInput';
-import AmPm from 'react-time-picker/dist/TimeInput/AmPm';
-import Divider from './Divider';
-import NativeInput from './DateTimeInput/NativeInput';
+import DayInput from "react-date-picker/dist/DateInput/DayInput";
+import MonthInput from "react-date-picker/dist/DateInput/MonthInput";
+import MonthSelect from "react-date-picker/dist/DateInput/MonthSelect";
+import YearInput from "react-date-picker/dist/DateInput/YearInput";
+import Hour12Input from "react-time-picker/dist/TimeInput/Hour12Input";
+import Hour24Input from "react-time-picker/dist/TimeInput/Hour24Input";
+import MinuteInput from "react-time-picker/dist/TimeInput/MinuteInput";
+import SecondInput from "react-time-picker/dist/TimeInput/SecondInput";
+import AmPm from "react-time-picker/dist/TimeInput/AmPm";
+import Divider from "./Divider";
+import NativeInput from "./DateTimeInput/NativeInput";
 
-import { getFormatter, formatDate } from './shared/dateFormatter';
-import {
-  convert12to24,
-  convert24to12,
-} from './shared/dates';
-import { isMaxDate, isMinDate } from './shared/propTypes';
-import { between, getAmPmLabels } from './shared/utils';
+import { getFormatter, formatDate } from "./shared/dateFormatter";
+import { convert12to24, convert24to12 } from "./shared/dates";
+import { isMaxDate, isMinDate } from "./shared/propTypes";
+import { between, getAmPmLabels } from "./shared/utils";
 
 const defaultMinDate = new Date();
 defaultMinDate.setFullYear(1, 0, 1);
 defaultMinDate.setHours(0, 0, 0, 0);
 const defaultMaxDate = new Date(8.64e15);
-const allViews = ['hour', 'minute', 'second'];
+const allViews = ["hour", "minute", "second"];
 
 function toDate(value) {
   if (value instanceof Date) {
@@ -46,17 +43,17 @@ function toDate(value) {
 
 function datesAreDifferent(date1, date2) {
   return (
-    (date1 && !date2)
-    || (!date1 && date2)
-    || (date1 && date2 && date1.getTime() !== date2.getTime())
+    (date1 && !date2) ||
+    (!date1 && date2) ||
+    (date1 && date2 && date1.getTime() !== date2.getTime())
   );
 }
 
 function isSameDate(date, year, month, day) {
   return (
-    year === getYear(date).toString()
-    && month === getMonthHuman(date).toString()
-    && day === getDate(date).toString()
+    year === getYear(date).toString() &&
+    month === getMonthHuman(date).toString() &&
+    day === getDate(date).toString()
   );
 }
 
@@ -65,7 +62,8 @@ function getValue(value, index) {
     return null;
   }
 
-  const rawValue = Array.isArray(value) && value.length === 2 ? value[index] : value;
+  const rawValue =
+    Array.isArray(value) && value.length === 2 ? value[index] : value;
 
   if (!rawValue) {
     return null;
@@ -80,9 +78,7 @@ function getValue(value, index) {
   return valueDate;
 }
 
-function getDetailValue({
-  value, minDate, maxDate,
-}, index) {
+function getDetailValue({ value, minDate, maxDate }, index) {
   const valuePiece = getValue(value, index);
 
   if (!valuePiece) {
@@ -97,7 +93,7 @@ const getDetailValueFrom = (args) => getDetailValue(args, 0);
 const getDetailValueTo = (args) => getDetailValue(args, 1);
 
 function isValidInput(element) {
-  return element.tagName === 'INPUT' && element.type === 'number';
+  return element.tagName === "INPUT" && element.type === "number";
 }
 
 function findInput(element, property) {
@@ -114,42 +110,46 @@ function focus(element) {
   }
 }
 
-function renderCustomInputs(placeholder, elementFunctions, allowMultipleInstances) {
+function renderCustomInputs(
+  placeholder,
+  elementFunctions,
+  allowMultipleInstances
+) {
   const usedFunctions = [];
   const pattern = new RegExp(
-    Object.keys(elementFunctions).map((el) => `${el}+`).join('|'), 'g',
+    Object.keys(elementFunctions)
+      .map((el) => `${el}+`)
+      .join("|"),
+    "g"
   );
   const matches = placeholder.match(pattern);
 
-  return placeholder.split(pattern)
-    .reduce((arr, element, index) => {
-      const divider = element && (
-        // eslint-disable-next-line react/no-array-index-key
-        <Divider key={`separator_${index}`}>
-          {element}
-        </Divider>
-      );
-      const res = [...arr, divider];
-      const currentMatch = matches && matches[index];
+  return placeholder.split(pattern).reduce((arr, element, index) => {
+    const divider = element && (
+      // eslint-disable-next-line react/no-array-index-key
+      <Divider key={`separator_${index}`}>{element}</Divider>
+    );
+    const res = [...arr, divider];
+    const currentMatch = matches && matches[index];
 
-      if (currentMatch) {
-        const renderFunction = (
-          elementFunctions[currentMatch]
-          || elementFunctions[
-            Object.keys(elementFunctions)
-              .find((elementFunction) => currentMatch.match(elementFunction))
-          ]
-        );
+    if (currentMatch) {
+      const renderFunction =
+        elementFunctions[currentMatch] ||
+        elementFunctions[
+          Object.keys(elementFunctions).find((elementFunction) =>
+            currentMatch.match(elementFunction)
+          )
+        ];
 
-        if (!allowMultipleInstances && usedFunctions.includes(renderFunction)) {
-          res.push(currentMatch);
-        } else {
-          res.push(renderFunction(currentMatch, index));
-          usedFunctions.push(renderFunction);
-        }
+      if (!allowMultipleInstances && usedFunctions.includes(renderFunction)) {
+        res.push(currentMatch);
+      } else {
+        res.push(renderFunction(currentMatch, index));
+        usedFunctions.push(renderFunction);
       }
-      return res;
-    }, []);
+    }
+    return res;
+  }, []);
 }
 
 export default class DateTimeInput extends PureComponent {
@@ -171,16 +171,22 @@ export default class DateTimeInput extends PureComponent {
      * which values provided are limited by minDate and maxDate so that the dates are the same),
      * get a new one.
      */
-    const nextValue = getDetailValueFrom({ value: nextProps.value, minDate, maxDate });
+    const nextValue = getDetailValueFrom({
+      value: nextProps.value,
+      minDate,
+      maxDate,
+    });
     const values = [nextValue, prevState.value];
     if (
       // Toggling calendar visibility resets values
-      nextState.isCalendarOpen // Flag was toggled
-      || datesAreDifferent(
-        ...values.map((value) => getDetailValueFrom({ value, minDate, maxDate })),
-      )
-      || datesAreDifferent(
-        ...values.map((value) => getDetailValueTo({ value, minDate, maxDate })),
+      nextState.isCalendarOpen || // Flag was toggled
+      datesAreDifferent(
+        ...values.map((value) =>
+          getDetailValueFrom({ value, minDate, maxDate })
+        )
+      ) ||
+      datesAreDifferent(
+        ...values.map((value) => getDetailValueTo({ value, minDate, maxDate }))
       )
     ) {
       if (nextValue) {
@@ -230,18 +236,18 @@ export default class DateTimeInput extends PureComponent {
 
   minuteInput = createRef();
 
-  secondInput= createRef();
+  secondInput = createRef();
 
   get formatTime() {
     const { maxDetail } = this.props;
 
-    const options = { hour: 'numeric' };
+    const options = { hour: "numeric" };
     const level = allViews.indexOf(maxDetail);
     if (level >= 1) {
-      options.minute = 'numeric';
+      options.minute = "numeric";
     }
     if (level >= 2) {
-      options.second = 'numeric';
+      options.second = "numeric";
     }
 
     return getFormatter(options);
@@ -272,18 +278,24 @@ export default class DateTimeInput extends PureComponent {
     const date = new Date(year, monthIndex, day);
     const formattedDate = formatDate(locale, date);
 
-    const datePieces = ['year', 'month', 'day'];
-    const datePieceReplacements = ['y', 'M', 'd'];
+    const datePieces = ["year", "month", "day"];
+    const datePieceReplacements = ["y", "M", "d"];
 
     function formatDatePiece(name, dateToFormat) {
-      return getFormatter({ useGrouping: false, [name]: 'numeric' })(locale, dateToFormat).match(/\d{1,}/);
+      return getFormatter({ useGrouping: false, [name]: "numeric" })(
+        locale,
+        dateToFormat
+      ).match(/\d{1,}/);
     }
 
     let placeholder = formattedDate;
     datePieces.forEach((datePiece, index) => {
       const formattedDatePiece = formatDatePiece(datePiece, date);
       const datePieceReplacement = datePieceReplacements[index];
-      placeholder = placeholder.replace(formattedDatePiece, datePieceReplacement);
+      placeholder = placeholder.replace(
+        formattedDatePiece,
+        datePieceReplacement
+      );
     });
 
     return placeholder;
@@ -298,14 +310,12 @@ export default class DateTimeInput extends PureComponent {
     const second = 14;
     const date = new Date(2017, 0, 1, hour24, minute, second);
 
-    return (
-      this.formatTime(locale, date)
-        .replace(this.formatNumber(locale, hour12), 'h')
-        .replace(this.formatNumber(locale, hour24), 'H')
-        .replace(this.formatNumber(locale, minute), 'mm')
-        .replace(this.formatNumber(locale, second), 'ss')
-        .replace(new RegExp(getAmPmLabels(locale).join('|')), 'a')
-    );
+    return this.formatTime(locale, date)
+      .replace(this.formatNumber(locale, hour12), "h")
+      .replace(this.formatNumber(locale, hour24), "H")
+      .replace(this.formatNumber(locale, minute), "mm")
+      .replace(this.formatNumber(locale, second), "ss")
+      .replace(new RegExp(getAmPmLabels(locale).join("|")), "a");
   }
 
   get placeholder() {
@@ -351,14 +361,8 @@ export default class DateTimeInput extends PureComponent {
   }
 
   get commonInputProps() {
-    const {
-      className,
-      disabled,
-      isWidgetOpen,
-      maxDate,
-      minDate,
-      required,
-    } = this.props;
+    const { className, disabled, isWidgetOpen, maxDate, minDate, required } =
+      this.props;
 
     return {
       className,
@@ -368,7 +372,7 @@ export default class DateTimeInput extends PureComponent {
       onChange: this.onChange,
       onKeyDown: this.onKeyDown,
       onKeyUp: this.onKeyUp,
-      placeholder: '--',
+      placeholder: "--",
       // This is only for showing validity when editing
       required: required || isWidgetOpen,
     };
@@ -398,25 +402,28 @@ export default class DateTimeInput extends PureComponent {
       const firstInput = event.target.children[1];
       focus(firstInput);
     }
-  }
+  };
 
   onKeyDown = (event) => {
     switch (event.key) {
-      case 'ArrowLeft':
-      case 'ArrowRight':
+      case "ArrowLeft":
+      case "ArrowRight":
       case this.dateDivider:
       case this.timeDivider: {
         event.preventDefault();
 
         const { target: input } = event;
-        const property = event.key === 'ArrowLeft' ? 'previousElementSibling' : 'nextElementSibling';
+        const property =
+          event.key === "ArrowLeft"
+            ? "previousElementSibling"
+            : "nextElementSibling";
         const nextInput = findInput(input, property);
         focus(nextInput);
         break;
       }
       default:
     }
-  }
+  };
 
   onKeyUp = (event) => {
     const { key, target: input } = event;
@@ -428,7 +435,7 @@ export default class DateTimeInput extends PureComponent {
     }
 
     const { value } = input;
-    const max = input.getAttribute('max');
+    const max = input.getAttribute("max");
 
     /**
      * Given 1, the smallest possible number the user could type by adding another digit is 10.
@@ -436,12 +443,12 @@ export default class DateTimeInput extends PureComponent {
      * However, given 2, smallers possible number would be 20, and thus keeping the focus in
      * this field doesn't make sense.
      */
-    if ((value * 10 > max) || (value.length >= max.length)) {
-      const property = 'nextElementSibling';
+    if (value * 10 > max || value.length >= max.length) {
+      const property = "nextElementSibling";
       const nextInput = findInput(input, property);
       focus(nextInput);
     }
-  }
+  };
 
   /**
    * Called when non-native date input is changed.
@@ -450,30 +457,26 @@ export default class DateTimeInput extends PureComponent {
     const { name, value } = event.target;
 
     switch (name) {
-      case 'hour12': {
+      case "hour12": {
         this.setState(
           (prevState) => ({
-            hour: value ? convert12to24(parseInt(value, 10), prevState.amPm).toString() : '',
+            hour: value
+              ? convert12to24(parseInt(value, 10), prevState.amPm).toString()
+              : "",
           }),
-          this.onChangeExternal,
+          this.onChangeExternal
         );
         break;
       }
-      case 'hour24': {
-        this.setState(
-          { hour: value },
-          this.onChangeExternal,
-        );
+      case "hour24": {
+        this.setState({ hour: value }, this.onChangeExternal);
         break;
       }
       default: {
-        this.setState(
-          { [name]: value },
-          this.onChangeExternal,
-        );
+        this.setState({ [name]: value }, this.onChangeExternal);
       }
     }
-  }
+  };
 
   /**
    * Called when native date input is changed.
@@ -491,14 +494,14 @@ export default class DateTimeInput extends PureComponent {
         return null;
       }
 
-      const [valueDate, valueTime] = value.split('T');
+      const [valueDate, valueTime] = value.split("T");
 
-      const [yearString, monthString, dayString] = valueDate.split('-');
+      const [yearString, monthString, dayString] = valueDate.split("-");
       const year = parseInt(yearString, 10);
       const monthIndex = parseInt(monthString, 10) - 1 || 0;
       const day = parseInt(dayString, 10) || 1;
 
-      const [hourString, minuteString, secondString] = valueTime.split(':');
+      const [hourString, minuteString, secondString] = valueTime.split(":");
       const hour = parseInt(hourString, 10) || 0;
       const minute = parseInt(minuteString, 10) || 0;
       const second = parseInt(secondString, 10) || 0;
@@ -511,23 +514,20 @@ export default class DateTimeInput extends PureComponent {
     })();
 
     onChange(processedValue, false);
-  }
+  };
 
   onChangeAmPm = (event) => {
     const { value } = event.target;
 
-    this.setState(
-      ({ amPm: value }),
-      this.onChangeExternal,
-    );
-  }
+    this.setState({ amPm: value }, this.onChangeExternal);
+  };
 
   /**
    * Called after internal onChange. Checks input validity. If all fields are valid,
    * calls props.onChange.
    */
   onChangeExternal = () => {
-    const { onChange } = this.props;
+    const { onChange, onInvalidEntry } = this.props;
 
     if (!onChange) {
       return;
@@ -554,12 +554,17 @@ export default class DateTimeInput extends PureComponent {
     if (formElementsWithoutSelect.every((formElement) => !formElement.value)) {
       onChange(null, false);
     } else if (
-      formElements.every((formElement) => formElement.value && formElement.validity.valid)
+      formElements.every(
+        (formElement) => formElement.value && formElement.validity.valid
+      )
     ) {
       const year = parseInt(values.year, 10);
       const monthIndex = parseInt(values.month, 10) - 1 || 0;
       const day = parseInt(values.day || 1, 10);
-      const hour = parseInt(values.hour24 || convert12to24(values.hour12, values.amPm) || 0, 10);
+      const hour = parseInt(
+        values.hour24 || convert12to24(values.hour12, values.amPm) || 0,
+        10
+      );
       const minute = parseInt(values.minute || 0, 10);
       const second = parseInt(values.second || 0, 10);
 
@@ -568,23 +573,22 @@ export default class DateTimeInput extends PureComponent {
       proposedValue.setHours(hour, minute, second, 0);
       const processedValue = proposedValue;
       onChange(processedValue, false);
+    } else if (onInvalidEntry) {
+      onInvalidEntry();
     }
-  }
+  };
 
   renderDay = (currentMatch, index) => {
-    const {
-      autoFocus,
-      dayAriaLabel,
-      dayPlaceholder,
-      showLeadingZeros,
-    } = this.props;
+    const { autoFocus, dayAriaLabel, dayPlaceholder, showLeadingZeros } =
+      this.props;
     const { day, month, year } = this.state;
 
     if (currentMatch && currentMatch.length > 2) {
       throw new Error(`Unsupported token: ${currentMatch}`);
     }
 
-    const showLeadingZerosFromFormat = currentMatch && currentMatch.length === 2;
+    const showLeadingZerosFromFormat =
+      currentMatch && currentMatch.length === 2;
 
     return (
       <DayInput
@@ -600,7 +604,7 @@ export default class DateTimeInput extends PureComponent {
         year={year}
       />
     );
-  }
+  };
 
   renderMonth = (currentMatch, index) => {
     const {
@@ -633,7 +637,8 @@ export default class DateTimeInput extends PureComponent {
       );
     }
 
-    const showLeadingZerosFromFormat = currentMatch && currentMatch.length === 2;
+    const showLeadingZerosFromFormat =
+      currentMatch && currentMatch.length === 2;
 
     return (
       <MonthInput
@@ -648,7 +653,7 @@ export default class DateTimeInput extends PureComponent {
         year={year}
       />
     );
-  }
+  };
 
   renderYear = (currentMatch, index) => {
     const { autoFocus, yearAriaLabel, yearPlaceholder } = this.props;
@@ -666,7 +671,7 @@ export default class DateTimeInput extends PureComponent {
         valueType="day"
       />
     );
-  }
+  };
 
   renderHour = (currentMatch, index) => {
     if (/h/.test(currentMatch)) {
@@ -699,7 +704,7 @@ export default class DateTimeInput extends PureComponent {
         value={hour}
       />
     );
-  }
+  };
 
   renderHour24 = (currentMatch, index) => {
     const { autoFocus, hourAriaLabel, hourPlaceholder } = this.props;
@@ -723,7 +728,7 @@ export default class DateTimeInput extends PureComponent {
         value={hour}
       />
     );
-  }
+  };
 
   renderMinute = (currentMatch, index) => {
     const { autoFocus, minuteAriaLabel, minutePlaceholder } = this.props;
@@ -748,7 +753,7 @@ export default class DateTimeInput extends PureComponent {
         value={minute}
       />
     );
-  }
+  };
 
   renderSecond = (currentMatch, index) => {
     const { autoFocus, secondAriaLabel, secondPlaceholder } = this.props;
@@ -774,7 +779,7 @@ export default class DateTimeInput extends PureComponent {
         value={second}
       />
     );
-  }
+  };
 
   renderAmPm = (currentMatch, index) => {
     const { amPmAriaLabel, autoFocus, locale } = this.props;
@@ -792,7 +797,7 @@ export default class DateTimeInput extends PureComponent {
         value={amPm}
       />
     );
-  }
+  };
 
   renderCustomInputs() {
     const { placeholder } = this;
@@ -809,19 +814,17 @@ export default class DateTimeInput extends PureComponent {
       a: this.renderAmPm,
     };
 
-    const allowMultipleInstances = typeof format !== 'undefined';
-    return renderCustomInputs(placeholder, elementFunctions, allowMultipleInstances);
+    const allowMultipleInstances = typeof format !== "undefined";
+    return renderCustomInputs(
+      placeholder,
+      elementFunctions,
+      allowMultipleInstances
+    );
   }
 
   renderNativeInput() {
-    const {
-      disabled,
-      maxDate,
-      minDate,
-      name,
-      nativeInputAriaLabel,
-      required,
-    } = this.props;
+    const { disabled, maxDate, minDate, name, nativeInputAriaLabel, required } =
+      this.props;
     const { value } = this.state;
 
     return (
@@ -846,10 +849,7 @@ export default class DateTimeInput extends PureComponent {
     /* eslint-disable jsx-a11y/click-events-have-key-events */
     /* eslint-disable jsx-a11y/no-static-element-interactions */
     return (
-      <div
-        className={className}
-        onClick={this.onClick}
-      >
+      <div className={className} onClick={this.onClick}>
         {this.renderNativeInput()}
         {this.renderCustomInputs()}
       </div>
@@ -858,8 +858,8 @@ export default class DateTimeInput extends PureComponent {
 }
 
 DateTimeInput.defaultProps = {
-  maxDetail: 'minute',
-  name: 'datetime',
+  maxDetail: "minute",
+  name: "datetime",
 };
 
 const isValue = PropTypes.oneOfType([
@@ -893,10 +893,8 @@ DateTimeInput.propTypes = {
   secondAriaLabel: PropTypes.string,
   secondPlaceholder: PropTypes.string,
   showLeadingZeros: PropTypes.bool,
-  value: PropTypes.oneOfType([
-    isValue,
-    PropTypes.arrayOf(isValue),
-  ]),
+  value: PropTypes.oneOfType([isValue, PropTypes.arrayOf(isValue)]),
   yearAriaLabel: PropTypes.string,
   yearPlaceholder: PropTypes.string,
+  onInvalidEntry: PropTypes.func,
 };
