@@ -227,6 +227,7 @@ export default class DateTimePicker extends PureComponent {
       value,
       yearAriaLabel,
       yearPlaceholder,
+      onInvalidEntry,
     } = this.props;
     const { isCalendarOpen, isClockOpen } = this.state;
 
